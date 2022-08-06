@@ -5,11 +5,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ArrayList implements List<Object> {
+public class ArrayList implements List<Name> {
     private static int range = 10;
-    private static Object[] array = new Object[range];
+    private static Name[] array = new Name[range];
     private int count = 0;
 
+    /**
+     *
+     * @return  длинну массива
+     */
+    public int lenth(){
+        return array.length;
+    }
+
+    /**
+     *  метод возвращает колличество элементов
+     * @return
+     */
     @Override
     public int size() {
         return count;
@@ -20,12 +32,10 @@ public class ArrayList implements List<Object> {
         return count == 0;
     }
 
+
     @Override
     public boolean contains(Object o) {
-        for (int i = 0; i < count; i++)
-            if (array[i] == o)
-                return true;
-        return false;
+        return indexOf(o) >= 0;
     }
 
     @Override
@@ -34,25 +44,25 @@ public class ArrayList implements List<Object> {
     }
 
     @Override
-    public Object[] toArray() {
-        Object[] copy = array;
+    public Name[] toArray() {
+        Name[] copy = array;
         return copy;
     }
 
     @Override
-    public Object[] toArray(Object[] a) {
-        a = new Object[count];
+    public <T> T[] toArray(T[] a) {
+        a = (T[]) new Name[count];
         for (int i = 0; i < count; i++)
-            a[i] = array[i];
+            a[i] = (T) array[i];
         return a;
     }
 
     @Override
-    public boolean add(Object o) {
+    public boolean add(Name o) {
         if (count == range - 1) {
             int oldRange = range;
             range = range + 5;
-            Object[] copy = new Object[range];
+            Name[] copy = new Name[range];
             for (int i = 0; i < oldRange; i++) {
                 copy[i] = array[i];
             }
@@ -67,29 +77,30 @@ public class ArrayList implements List<Object> {
         return true;
     }
 
+
     @Override
     public boolean remove(Object o) {
         boolean remove = false;
         for (int i = 0; i <= size(); i++) {
-            if (array[i] == o) {
+            if (o.equals(array[i])) {
                 array[i] = null;
                 remove = true;
             }
         }
-        return remove;
-    }
+        return remove;    }
+
 
     @Override
     public boolean addAll(Collection c) {
         for (Object item : c)
-            add(item);
+            add((Name) item);
         return true;
     }
 
     @Override
     public boolean addAll(int index, Collection c) {
         for (Object item : c) {
-            add(index, item);
+            add(index, (Name) item);
             index++;
         }
         return true;
@@ -97,38 +108,47 @@ public class ArrayList implements List<Object> {
 
     @Override
     public void clear() {
+        for (int i = 0; i <= count; i++)
+            array[i] = null;
         count = 0;
-        array = null;
+
+
     }
 
     @Override
-    public Object get(int index) {
+    public Name get(int index) {
         return array[index];
     }
 
     @Override
-    public Object set(int index, Object element) {
+    public Name set(int index, Name element) {
         array[index] = element;
         return element;
     }
 
     @Override
-    public void add(int index, Object element) {
+    public void add(int index, Name element) {
         if (count == range - 1) {
             int oldRange = range;
             range = range + 5;
-            Object[] copy = new Object[range];
+            Name[] copy = new Name[range];
             for (int i = 0; i < oldRange; i++) {
                 copy[i] = array[i];
             }
-            copy[count] = element;
+            for (int i = 0; i <= count; i++) {
+                if (i >= index) {
+                    Name o = copy[i];
+                    copy[i] = element;
+                    element = o;
+                }
+            }
             count++;
             array = copy;
 
         } else {
             for (int i = 0; i <= count; i++) {
                 if (i >= index) {
-                    Object o = array[i];
+                    Name o = array[i];
                     array[i] = element;
                     element = o;
                 }
@@ -138,32 +158,38 @@ public class ArrayList implements List<Object> {
     }
 
     @Override
-    public Object remove(int index) {
+    public Name remove(int index) {
         array[index] = null;
+        for (int i = index; i < count; i++) {
+            int next = i + 1;
+                array[i] = array[next];
+                array[next] = null;
+        }
+        count--;
         return null;
     }
 
     @Override
     public int indexOf(Object o) {
-        int index = 0;
+        int index = -1;
+        for (int i = 0; i <= size(); i++) {
+            if (o.equals(array[i])) {
+                index = i;
+               return index;
+            }
+        }
+        return index;    }
+
+    @Override
+    public int lastIndexOf(java.lang.Object o) {
+        int index = 0;  
         for (int i = 0; i <= size(); i++) {
             if (array[i] == o) {
                 index = i;
-                break;
             }
         }
-        return index;
-    }
+        return index;    }
 
-    @Override
-    public int lastIndexOf(Object o) {
-        for (int i = 0; i <= size(); i++) {
-            if (array[i] == o) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     @Override
     public ListIterator listIterator() {
@@ -177,7 +203,7 @@ public class ArrayList implements List<Object> {
 
     @Override
     public List subList(int fromIndex, int toIndex) {
-        List<Object> subList = new java.util.ArrayList<>();
+        List<Name> subList = new java.util.ArrayList<>();
         for (int i = fromIndex; i <= toIndex; i++) {
             subList.add(array[i]);
         }
@@ -186,11 +212,13 @@ public class ArrayList implements List<Object> {
 
     @Override
     public boolean retainAll(Collection c) {
+        Name[] copy = new Name[range];
         boolean remove = false;
-        for (Object e : c) {
+        for (java.lang.Object e : c) {
             for (int i = 0; i <= size(); i++) {
-                if (array[i] != e) {
-                    array[i] = null;
+                if (array[i] == e) {
+                    copy[i] = array[i];
+                    array = copy;
                     remove = true;
                 }
             }
@@ -209,14 +237,15 @@ public class ArrayList implements List<Object> {
 
     @Override
     public boolean containsAll(Collection c) {
-        for (Object item : c)
+        for (Object item : c) {
             if (contains(item))
                 return false;
+        }
         return true;
     }
 
 
-    private static class ArrayListIterator implements Iterator<Object> {
+    private static class ArrayListIterator implements Iterator<Name> {
         int nextIndex = 0;
         int index = 0;
 
@@ -226,11 +255,12 @@ public class ArrayList implements List<Object> {
                 nextIndex++;
                 index = nextIndex--;
                 return true;
-            } return false;
+            }
+            return false;
         }
 
         @Override
-        public Object next() {
+        public Name next() {
             return array[nextIndex];
         }
     }
@@ -253,7 +283,7 @@ public class ArrayList implements List<Object> {
         }
 
         @Override
-        public Object next() {
+        public Name next() {
             return array[nextIndex];
         }
 
@@ -270,7 +300,7 @@ public class ArrayList implements List<Object> {
         }
 
         @Override
-        public Object previous() {
+        public Name previous() {
             return array[previousIndex];
         }
 
@@ -290,20 +320,20 @@ public class ArrayList implements List<Object> {
         }
 
         @Override
-        public void set(Object o) {
-            array[index] = o;
+        public void set(java.lang.Object o) {
+            array[index] = (Name) o;
         }
 
         @Override
-        public void add(Object o) {
+        public void add(java.lang.Object o) {
             for (int i = 0; i <= array.length; i++) {
                 if (i >= index) {
-                    Object e = array[i];
-                    array[i] = o;
+                    Name e = array[i];
+                    array[i] = (Name) o;
                     o = e;
                 }
-
             }
         }
+
     }
 }
